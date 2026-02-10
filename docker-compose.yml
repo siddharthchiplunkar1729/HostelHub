@@ -1,0 +1,36 @@
+services:
+  web:
+    build: .
+    container_name: hostelhub-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/hostelhub
+      - JWT_SECRET=your_jwt_secret_key_here
+    depends_on:
+      - db
+    networks:
+      - textnet
+
+  db:
+    image: postgres:15-alpine
+    container_name: hostelhub-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hostelhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - textnet
+
+networks:
+  textnet:
+
+volumes:
+  pgdata:
